@@ -1,0 +1,78 @@
+{
+  "validator": {
+    "$jsonSchema": {
+      "bsonType": "object",
+      "required": [
+        "name",
+        "dataNascimento",
+        "anoBatismo",
+        "sexo",
+        "status",
+        "dataStatus",
+        "validado",
+        "dataAniversario"
+      ],
+      "properties": {
+        "name": {
+          "bsonType": "string"
+        },
+        "dataNascimento": {
+          "bsonType": "string",
+          "description": "Formato ISO: yyyy-mm-dd"
+        },
+        "anoBatismo": {
+          "bsonType": "int"
+        },
+        "sexo": {
+          "bsonType": "string"
+        },
+        "estadoCivil": {
+          "bsonType": "string"
+        },
+        "dataCasamento": {
+          "bsonType": "string",
+          "description": "Formato ISO ou vazio se não casado"
+        },
+        "nomeConjuge": {
+          "bsonType": "string"
+        },
+        "filho": {
+          "bsonType": "bool"
+        },
+        "email": {
+          "bsonType": "string"
+        },
+        "telefone": {
+          "bsonType": "string"
+        },
+        "status": {
+          "bsonType": "string"
+        },
+        "dataStatus": {
+          "bsonType": "string"
+        },
+        "validado": {
+          "bsonType": "bool"
+        },
+        "dataAniversario": {
+          "bsonType": "string"
+        },
+        "cep": {
+          "bsonType": "string"
+        },
+        "rua": {
+          "bsonType": "string"
+        },
+        "numero": {
+          "bsonType": "string"
+        },
+        "bairro": {
+          "bsonType": "string"
+        },
+        "complemento": {
+          "bsonType": "string"
+        }
+      }
+    }
+  }
+}

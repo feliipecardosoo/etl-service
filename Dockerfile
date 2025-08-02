@@ -8,7 +8,7 @@ RUN go mod download
 
 COPY . .
 
-RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-s -w" -o etl-service ./src
+RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-s -w" -o etl-service .
 
 FROM alpine:3.20
 

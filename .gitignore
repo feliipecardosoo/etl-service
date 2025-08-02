@@ -1,2 +1,3 @@
 # Ignorar a pasta temp
 temp/
+.env
