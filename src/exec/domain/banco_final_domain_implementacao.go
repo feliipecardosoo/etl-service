@@ -112,7 +112,7 @@ func (m *membroDomain) ToModel() bancofinal.Membro {
 		Sexo:           m.sexo,
 		EstadoCivil:    m.estadoCivil,
 		DataCasamento:  m.dataCasamento,
-		NomeConjuge:    &m.nomeConjuge,
+		NomeConjuge:    m.nomeConjuge,
 		Filho:          m.filho,
 		Email:          m.email,
 		Telefone:       m.telefone,
@@ -124,7 +124,7 @@ func (m *membroDomain) ToModel() bancofinal.Membro {
 			Rua:         m.endereco.rua,
 			Numero:      m.endereco.numero,
 			Bairro:      m.endereco.bairro,
-			Complemento: &m.endereco.complemento,
+			Complemento: m.endereco.complemento,
 		},
 		DataAniversario: m.dataAniversario,
 	}

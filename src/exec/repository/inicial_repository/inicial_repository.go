@@ -1,6 +1,7 @@
 package inicialrepository
 
 import (
+	bancofinal "etl-service/src/config/model/banco_final"
 	bancoinicial "etl-service/src/config/model/banco_inicial"
 )
 
@@ -26,4 +27,6 @@ type InicialRepository interface {
 	// - Um mapa string->bool indicando quais nomes existem no banco (true significa que o nome existe).
 	// - Um erro caso ocorra falha durante a consulta.
 	ExistsByNames(names []string) (map[string]bool, error)
+
+	Insert(membro bancofinal.Membro) error
 }
