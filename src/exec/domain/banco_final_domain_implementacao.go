@@ -6,6 +6,7 @@ import (
 	bancoinicial "etl-service/src/config/model/banco_inicial"
 	"fmt"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -77,8 +78,13 @@ func NewBancoFinalMembroDomain(m bancoinicial.Membro) (BancoFinalMembroDomain, e
 		dataBatismoFormatada = 0
 	}
 
+	nameFormatado, err := getName(m.Name)
+	if err != nil {
+		return nil, fmt.Errorf("erro ao formatar name '%s': %w", m.Name, err)
+	}
+
 	return &membroDomain{
-		name:            m.Name,
+		name:            nameFormatado,
 		dataNascimento:  m.DataNascimento,
 		anoBatismo:      dataBatismoFormatada,
 		sexo:            m.Sexo,
@@ -142,4 +148,13 @@ func getBatismo(dataBatismo string) (int, error) {
 		return 0, errors.New("erro ao converter ano de batismo para inteiro")
 	}
 	return ano, nil
+}
+
+// getName converte o name para uppercase.
+// Retorna erro caso a conversão falhe.
+func getName(name string) (string, error) {
+	if name == "" {
+		return "", errors.New("nome vazio")
+	}
+	return strings.ToUpper(name), nil
 }

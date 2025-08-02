@@ -17,7 +17,7 @@ type dataInicialRepository struct {
 	conn database.MongoConnection // Interface que gerencia a conexão com o MongoDB.
 }
 
-// NewDataInicialRepository cria e retorna uma nova instância de dataInicialRepository
+// NewDataInicialRepository cria e retorna uma nova instância de dataInicialRepository,
 // recebendo uma conexão MongoConnection para interação com o banco.
 func NewDataInicialRepository(conn database.MongoConnection) InicialRepository {
 	return &dataInicialRepository{
@@ -27,34 +27,30 @@ func NewDataInicialRepository(conn database.MongoConnection) InicialRepository {
 
 // GetAllMembrosRequisicao busca todos os documentos da coleção membros no banco definido nas variáveis de ambiente.
 //
-// Essa função:
-// - Obtém o contexto com timeout da conexão Mongo para evitar consultas muito longas.
-// - Lê as variáveis de ambiente MONGO_DB_NAME e MONGO_COLLECTION_MEMBRO para determinar o banco e coleção.
-// - Executa uma consulta Find com filtro vazio (bson.D{}), ou seja, retorna todos os documentos da coleção.
-// - Retorna um slice com todos os membros encontrados ou erro, que pode ser por timeout ou falha na consulta.
+// Fluxo da função:
+// - Obtém contexto com timeout via conexão para limitar tempo de consulta.
+// - Lê as variáveis de ambiente MONGO_DB_NAME e MONGO_COLLECTION_MEMBRO para definir banco e coleção.
+// - Realiza consulta Find com filtro vazio (bson.D{}), retornando todos os documentos da coleção.
+// - Decodifica os documentos retornados para um slice de bancoinicial.Membro.
+// - Retorna o slice de membros ou erro caso a consulta ou decodificação falhe.
 //
-// Caso o timeout do contexto seja excedido durante a busca ou decodificação, retorna erro específico de timeout.
+// Tratamento especial para erros de timeout do contexto, retornando mensagens específicas.
 func (d *dataInicialRepository) GetAllMembrosRequisicao() ([]bancoinicial.Membro, error) {
-	// Obtém contexto com timeout via conexão
 	ctx, cancel := d.conn.ContextWithTimeout()
 	defer cancel()
 
-	// Obtém nome do banco via variável de ambiente
 	MONGO_DB_NAME := os.Getenv("MONGO_DB_NAME")
 	if MONGO_DB_NAME == "" {
 		log.Fatal("❌ Variável de ambiente MONGO_DB_NAME não configurada.")
 	}
 
-	// Obtém nome da coleção via variável de ambiente
 	MONGO_COLLECTION_MEMBRO := os.Getenv("MONGO_COLLECTION_MEMBRO")
 	if MONGO_COLLECTION_MEMBRO == "" {
 		log.Fatal("❌ Variável de ambiente MONGO_COLLECTION_MEMBRO não configurada.")
 	}
 
-	// Obtém referência à coleção do MongoDB para realizar operações
 	collection := d.conn.Collection(MONGO_DB_NAME, MONGO_COLLECTION_MEMBRO)
 
-	// Executa a consulta Find para obter todos os documentos
 	cursor, err := collection.Find(ctx, bson.D{})
 	if err != nil {
 		if ctx.Err() == context.DeadlineExceeded {
@@ -65,7 +61,6 @@ func (d *dataInicialRepository) GetAllMembrosRequisicao() ([]bancoinicial.Membro
 	defer cursor.Close(ctx)
 
 	var membros []bancoinicial.Membro
-	// Decodifica todos os documentos retornados para o slice membros
 	if err := cursor.All(ctx, &membros); err != nil {
 		if ctx.Err() == context.DeadlineExceeded {
 			return nil, fmt.Errorf("tempo limite excedido ao decodificar os membros")
@@ -73,6 +68,50 @@ func (d *dataInicialRepository) GetAllMembrosRequisicao() ([]bancoinicial.Membro
 		return nil, fmt.Errorf("erro ao decodificar os membros: %w", err)
 	}
 
-	// Retorna o slice preenchido com os membros encontrados
 	return membros, nil
+}
+
+// ExistsByNames verifica a existência de múltiplos nomes na coleção do banco final.
+//
+// Parâmetros:
+// - names: slice de strings com os nomes a serem verificados.
+//
+// Fluxo da função:
+// - Cria contexto com timeout.
+// - Obtém nomes do banco e da coleção via variáveis de ambiente.
+// - Executa uma consulta usando filtro {$in: names} para encontrar membros com esses nomes.
+// - Itera sobre os resultados e preenche um mapa string->bool indicando quais nomes existem.
+//
+// Retorna:
+// - Um mapa em que a chave é o nome e o valor bool indica se existe no banco.
+// - Erro em caso de falha na consulta ou decodificação.
+func (d *dataInicialRepository) ExistsByNames(names []string) (map[string]bool, error) {
+	ctx, cancel := d.conn.ContextWithTimeout()
+	defer cancel()
+
+	dbName := os.Getenv("MONGO_DB_BANCO_FINAL")
+	collectionName := os.Getenv("MONGO_COLLECTION_BANCO_FINAL")
+
+	collection := d.conn.Collection(dbName, collectionName)
+
+	filter := bson.M{"name": bson.M{"$in": names}}
+
+	cursor, err := collection.Find(ctx, filter)
+	if err != nil {
+		return nil, err
+	}
+	defer cursor.Close(ctx)
+
+	existing := make(map[string]bool)
+	for cursor.Next(ctx) {
+		var m struct {
+			Name string `bson:"name"`
+		}
+		if err := cursor.Decode(&m); err != nil {
+			return nil, err
+		}
+		existing[m.Name] = true
+	}
+
+	return existing, nil
 }
