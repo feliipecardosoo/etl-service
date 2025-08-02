@@ -1,11 +1,10 @@
 package getdata
 
 import (
-	"encoding/json"
-	bancoinicial "etl-service/src/config/model/banco_inicial"
+	"etl-service/src/exec/domain"
 	inicialrepository "etl-service/src/exec/repository/inicial_repository"
 	"fmt"
-	"log"
+	"time"
 )
 
 // getDataBancoInicial é a implementação da interface GetDataBancoInicial.
@@ -25,24 +24,30 @@ func NewGetDataBancoInicial(repo inicialrepository.InicialRepository) GetDataBan
 
 // GetAll busca todos os membros na fonte de dados usando o repositório.
 // Retorna uma lista de membros e um erro caso a operação falhe.
-func (g *getDataBancoInicial) GetAll() ([]bancoinicial.Membro, error) {
+func (g *getDataBancoInicial) GetAll() error {
+	start := time.Now() // captura o tempo no começo
+
 	membros, err := g.repo.GetAllMembrosRequisicao()
 	if err != nil {
-		return nil, fmt.Errorf("erro ao obter membros: %w", err)
+		return fmt.Errorf("erro ao obter membros: %w", err)
 	}
 
-	// Verificar como esta vindo essa variavel membros
-	// antes do insert, verificar se ja tem o membro com este nome.
-
-	// Imprime cada membro como JSON formatado
-	for i, m := range membros {
-		jsonData, err := json.MarshalIndent(m, "", "  ")
+	for _, m := range membros {
+		domainMembro, err := domain.NewBancoFinalMembroDomain(m) // aqui é 1 a 1
 		if err != nil {
-			log.Printf("Erro ao converter membro %d para JSON: %v", i, err)
-			continue
+			return err
 		}
-		log.Printf("📌 Membro %d:\n%s\n", i+1, string(jsonData))
+		model := domainMembro.ToModel()
+
+		// Verificar se membro já existe no BD
+
+		fmt.Println("Membro pronto pra inserir:", model.Name)
 	}
 
-	return membros, nil
+	fmt.Printf("Membros totais: %d\n", len(membros))
+
+	duration := time.Since(start) // calcula o tempo decorrido desde o start
+	fmt.Printf("Tempo de execução: %s\n", duration)
+
+	return nil
 }

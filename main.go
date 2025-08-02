@@ -44,7 +44,7 @@ func main() {
 	service := getdata.NewGetDataBancoInicial(repo)
 
 	// Chama o método GetAll para buscar todos os membros no banco
-	_, err := service.GetAll()
+	err := service.GetAll()
 	if err != nil {
 		log.Fatalf("Erro ao buscar membros: %v", err)
 	}
