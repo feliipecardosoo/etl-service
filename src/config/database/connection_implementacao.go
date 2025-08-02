@@ -51,3 +51,15 @@ func (m *mongoConnectionImpl) Connect(uri string) error {
 func (m *mongoConnectionImpl) Collection(dbName, collectionName string) *mongo.Collection {
 	return m.client.Database(dbName).Collection(collectionName)
 }
+
+// ContextWithTimeout retorna um contexto com timeout de 15 segundos,
+// usado para operações que precisam ser canceladas se demorarem muito.
+func (m *mongoConnectionImpl) ContextWithTimeout() (context.Context, context.CancelFunc) {
+	return context.WithTimeout(context.Background(), 15*time.Second)
+}
+
+// Disconnect encerra a conexão com o MongoDB utilizando o contexto fornecido.
+// Retorna erro caso a desconexão falhe.
+func (m *mongoConnectionImpl) Disconnect(ctx context.Context) error {
+	return m.client.Disconnect(ctx)
+}
