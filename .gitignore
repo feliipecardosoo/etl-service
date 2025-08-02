@@ -1,3 +1,45 @@
-# Ignorar a pasta temp
-temp/
+# Go build artifacts
+/bin/
+/build/
+/dist/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
+# IDEs e editores
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Go modules
+vendor/
+
+# Arquivos de log e temporários
+*.log
+*.tmp
+*.bak
+*.old
+
+# Arquivos de ambiente
 .env
+.env.*
+
+# Diretório de arquivos temporários
+temp/
+
+# Debug do Delve
+__debug_bin*
+
+# Arquivos gerados por testes
+coverage.*
+*.coverprofile
+*.testresult
+
+# Arquivos do sistema
+.DS_Store
+Thumbs.db

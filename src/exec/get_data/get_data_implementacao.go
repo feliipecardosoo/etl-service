@@ -1,9 +1,11 @@
 package getdata
 
 import (
+	"encoding/json"
 	bancoinicial "etl-service/src/config/model/banco_inicial"
 	inicialrepository "etl-service/src/exec/repository/inicial_repository"
 	"fmt"
+	"log"
 )
 
 // getDataBancoInicial é a implementação da interface GetDataBancoInicial.
@@ -28,5 +30,19 @@ func (g *getDataBancoInicial) GetAll() ([]bancoinicial.Membro, error) {
 	if err != nil {
 		return nil, fmt.Errorf("erro ao obter membros: %w", err)
 	}
+
+	// Verificar como esta vindo essa variavel membros
+	// antes do insert, verificar se ja tem o membro com este nome.
+
+	// Imprime cada membro como JSON formatado
+	for i, m := range membros {
+		jsonData, err := json.MarshalIndent(m, "", "  ")
+		if err != nil {
+			log.Printf("Erro ao converter membro %d para JSON: %v", i, err)
+			continue
+		}
+		log.Printf("📌 Membro %d:\n%s\n", i+1, string(jsonData))
+	}
+
 	return membros, nil
 }
