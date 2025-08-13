@@ -33,4 +33,5 @@ type Membro struct {
 	Validado        bool     `bson:"validado"`                // Indica se o cadastro foi validado
 	Endereco        Endereco `bson:"endereco"`                // Endereço completo do membro
 	DataAniversario string   `bson:"dataAniversario"`         // Data do aniversário no formato string
+	DataModificacao string   `bson:"dataModificacao"`         // Data do aniversário no formato string
 }

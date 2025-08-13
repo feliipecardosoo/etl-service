@@ -28,6 +28,7 @@ type membroDomain struct {
 	endereco        enderecoRequest // Endereço do membro no formato interno do domínio
 	validado        bool            // Indica se o cadastro foi validado
 	dataAniversario string          // Data do aniversário no formato dia/mês (ex: "31/03")
+	dataModificacao string          // Data da modificacao no formato dia/mês (ex: "31/03")
 }
 
 // enderecoRequest representa o endereço usado internamente no domínio,
@@ -78,10 +79,14 @@ func NewBancoFinalMembroDomain(m bancoinicial.Membro) (BancoFinalMembroDomain, e
 		dataBatismoFormatada = 0
 	}
 
+	// Formata o nome para mantermos um padrão a ser seguido
 	nameFormatado, err := getName(m.Name)
 	if err != nil {
 		return nil, fmt.Errorf("erro ao formatar name '%s': %w", m.Name, err)
 	}
+
+	// Captura a data atual (sempre hoje) para indicar alteração no banco de dados e facilitar o backup
+	dataModificacao := getDataModificacao()
 
 	return &membroDomain{
 		name:            nameFormatado,
@@ -99,6 +104,7 @@ func NewBancoFinalMembroDomain(m bancoinicial.Membro) (BancoFinalMembroDomain, e
 		endereco:        end,
 		validado:        m.Validado,
 		dataAniversario: dataNascimentoFormatada,
+		dataModificacao: dataModificacao,
 	}, nil
 }
 
@@ -106,19 +112,20 @@ func NewBancoFinalMembroDomain(m bancoinicial.Membro) (BancoFinalMembroDomain, e
 // pronto para ser utilizado na camada de repositório ou persistência.
 func (m *membroDomain) ToModel() bancofinal.Membro {
 	return bancofinal.Membro{
-		Name:           m.name,
-		DataNascimento: m.dataNascimento,
-		AnoBatismo:     m.anoBatismo,
-		Sexo:           m.sexo,
-		EstadoCivil:    m.estadoCivil,
-		DataCasamento:  m.dataCasamento,
-		NomeConjuge:    m.nomeConjuge,
-		Filho:          m.filho,
-		Email:          m.email,
-		Telefone:       m.telefone,
-		Status:         m.status,
-		DataStatus:     m.dataStatus,
-		Validado:       m.validado,
+		Name:            m.name,
+		DataNascimento:  m.dataNascimento,
+		AnoBatismo:      m.anoBatismo,
+		Sexo:            m.sexo,
+		EstadoCivil:     m.estadoCivil,
+		DataCasamento:   m.dataCasamento,
+		NomeConjuge:     m.nomeConjuge,
+		Filho:           m.filho,
+		Email:           m.email,
+		Telefone:        m.telefone,
+		Status:          m.status,
+		DataStatus:      m.dataStatus,
+		Validado:        m.validado,
+		DataModificacao: m.dataModificacao,
 		Endereco: bancofinal.Endereco{
 			Cep:         m.endereco.cep,
 			Rua:         m.endereco.rua,
@@ -157,4 +164,9 @@ func getName(name string) (string, error) {
 		return "", errors.New("nome vazio")
 	}
 	return strings.ToUpper(name), nil
+}
+
+// getDataModificacao pega a data atual para facilitar o sistema de backup e indicar de houve alteração naquele usuario
+func getDataModificacao() string {
+	return time.Now().Format("02/01/2006")
 }

@@ -57,6 +57,10 @@
         "dataAniversario": {
           "bsonType": "string"
         },
+        "dataModificacao": {
+          "bsonType": "string",
+          "description": "Formato ISO: yyyy-mm-dd"
+        },
         "cep": {
           "bsonType": "string"
         },
