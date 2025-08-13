@@ -84,6 +84,7 @@ Exemplo de schema JSON Schema para o MongoDB:
       "dataStatus": {"bsonType": "string"},
       "validado": {"bsonType": "bool"},
       "dataAniversario": {"bsonType": "string"},
+      "dataModificacao": {"bsonType": "string"},
       "endereco": {
         "bsonType": "object",
         "required": ["cep", "rua", "numero", "bairro"],
@@ -118,3 +119,6 @@ Exemplo de schema JSON Schema para o MongoDB:
 2. Configure a conexão com o MongoDB no repositório Go.
 3. Execute a função `GetAll()` para processar os membros.
 4. Verifique os arquivos `duplicados.txt` e `erros_insercao.txt` para auditoria.
+
+## Sistema de backup
+- Possuo um sistema de backup deste banco no repositório: `https://github.com/feliipecardosoo/backup-bd-mongo`
