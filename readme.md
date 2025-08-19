@@ -121,4 +121,4 @@ Exemplo de schema JSON Schema para o MongoDB:
 4. Verifique os arquivos `duplicados.txt` e `erros_insercao.txt` para auditoria.
 
 ## Sistema de backup
-- Possuo um sistema de backup deste banco no repositório: `https://github.com/feliipecardosoo/backup-etl`
+- Possuo um sistema de backup deste banco no repositório: `https://github.com/feliipecardosoo/backup`
